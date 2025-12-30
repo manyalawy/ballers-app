@@ -30,8 +30,11 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# environment files (contain credentials)
+.env*
+.env.local
+.env.development
+.env.production
 
 # typescript
 *.tsbuildinfo
@@ -39,3 +42,24 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Supabase
+supabase/.branches
+supabase/.temp
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude Code
+.claude/
+
+# Testing
+coverage/
+
+# Misc
+*.log
+tmp/
+temp/
