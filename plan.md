@@ -131,14 +131,14 @@ supabase gen types typescript --local > src/types/database.types.ts
 ├── config.toml                    # Supabase config
 ├── seed.sql                       # Seed data for development
 ├── migrations/
-│   ├── 20240101000000_initial_schema.sql
-│   ├── 20240102000000_add_cities.sql
-│   ├── 20240103000000_add_profiles.sql
-│   ├── 20240104000000_add_matches.sql
-│   ├── 20240105000000_add_chat.sql
-│   ├── 20240106000000_add_ratings.sql
-│   ├── 20240107000000_add_notifications.sql
-│   └── 20240108000000_add_rls_policies.sql
+│   ├── <timestamp>_initial_schema.sql
+│   ├── <timestamp>_add_cities.sql
+│   ├── <timestamp>_add_profiles.sql
+│   ├── <timestamp>_add_matches.sql
+│   ├── <timestamp>_add_chat.sql
+│   ├── <timestamp>_add_ratings.sql
+│   ├── <timestamp>_add_notifications.sql
+│   └── <timestamp>_add_rls_policies.sql
 └── functions/
     ├── match-reminders/
     └── send-push/
@@ -1086,19 +1086,46 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 8. Create RLS policies migration
 9. Create seed.sql for development data
 10. Generate TypeScript types from schema
+11. Add npm scripts for migration commands
+12. Create GitHub Actions workflow for CI/CD migrations
+
+**Migration npm scripts (add to package.json):**
+
+```json
+{
+  "scripts": {
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:migrate": "supabase db push",
+    "db:migrate:status": "supabase migration list",
+    "db:migrate:new": "supabase migration new",
+    "db:types": "supabase gen types typescript --local > src/types/database.types.ts"
+  }
+}
+```
+
+**How migration tracking works:**
+- Supabase tracks applied migrations in `supabase_migrations.schema_migrations` table
+- `npm run db:migrate:status` shows pending vs applied migrations
+- `npm run db:migrate` runs only pending migrations on remote
+- `npm run db:reset` resets local DB and runs all migrations from scratch
 
 **Files to create:**
 
-- `supabase/migrations/20240101000000_initial_schema.sql`
-- `supabase/migrations/20240102000000_add_cities.sql`
-- `supabase/migrations/20240103000000_add_profiles.sql`
-- `supabase/migrations/20240104000000_add_matches.sql`
-- `supabase/migrations/20240105000000_add_chat.sql`
-- `supabase/migrations/20240106000000_add_ratings.sql`
-- `supabase/migrations/20240107000000_add_notifications.sql`
-- `supabase/migrations/20240108000000_add_rls_policies.sql`
+> **Note:** Timestamps below are placeholders for ordering. Actual files will be created using `supabase migration new <name>` which generates real timestamps (e.g., `20251231150000_add_cities.sql`).
+
+- `supabase/migrations/<timestamp>_initial_schema.sql`
+- `supabase/migrations/<timestamp>_add_cities.sql`
+- `supabase/migrations/<timestamp>_add_profiles.sql`
+- `supabase/migrations/<timestamp>_add_matches.sql`
+- `supabase/migrations/<timestamp>_add_chat.sql`
+- `supabase/migrations/<timestamp>_add_ratings.sql`
+- `supabase/migrations/<timestamp>_add_notifications.sql`
+- `supabase/migrations/<timestamp>_add_rls_policies.sql`
 - `supabase/seed.sql`
 - `src/types/database.types.ts` (auto-generated)
+- `.github/workflows/migrate-production.yml`
 
 ### Phase 2: Authentication
 
