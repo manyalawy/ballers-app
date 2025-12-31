@@ -41,6 +41,11 @@ enable_signup = true
 enable_signup = true
 enable_confirmations = true
 
+[auth.sms.test_otp]
+"+201234567890" = "123456"
+"+201111111111" = "123456"
+"+201000000000" = "123456"
+
 [auth.sms.twilio]
 enabled = false
 account_sid = ""
