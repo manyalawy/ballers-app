@@ -1,5 +1,8 @@
 -- Matches and participants tables
 
+-- Include extensions schema in search_path for PostGIS types
+SET search_path TO public, extensions;
+
 CREATE TABLE matches (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   creator_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,

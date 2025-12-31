@@ -1,6 +1,9 @@
 -- Cities table for supported locations
 -- Matches can only be created in active cities
 
+-- Include extensions schema in search_path for PostGIS types
+SET search_path TO public, extensions;
+
 CREATE TABLE cities (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
