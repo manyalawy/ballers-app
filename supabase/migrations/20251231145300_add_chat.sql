@@ -31,12 +31,12 @@ CREATE INDEX idx_chat_messages_created_at ON chat_messages(chat_room_id, created
 CREATE OR REPLACE FUNCTION update_chat_room_last_message()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE chat_rooms
+  UPDATE public.chat_rooms
   SET last_message_at = NEW.created_at
   WHERE id = NEW.chat_room_id;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = '';
 
 CREATE TRIGGER chat_message_inserted
   AFTER INSERT ON chat_messages
@@ -47,11 +47,11 @@ CREATE TRIGGER chat_message_inserted
 CREATE OR REPLACE FUNCTION create_match_chat_room()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO chat_rooms (match_id)
+  INSERT INTO public.chat_rooms (match_id)
   VALUES (NEW.id);
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = '';
 
 CREATE TRIGGER match_chat_room_created
   AFTER INSERT ON matches

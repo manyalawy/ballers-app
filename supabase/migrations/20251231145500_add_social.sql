@@ -37,7 +37,7 @@ CREATE OR REPLACE FUNCTION are_friends(user1_id UUID, user2_id UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM friendships
+    SELECT 1 FROM public.friendships
     WHERE status = 'accepted'
       AND (
         (requester_id = user1_id AND addressee_id = user2_id)
@@ -45,16 +45,16 @@ BEGIN
       )
   );
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = '';
 
 -- Function to check if user is blocked
 CREATE OR REPLACE FUNCTION is_blocked(checker_id UUID, target_id UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM user_blocks
+    SELECT 1 FROM public.user_blocks
     WHERE (blocker_id = checker_id AND blocked_id = target_id)
        OR (blocker_id = target_id AND blocked_id = checker_id)
   );
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = '';

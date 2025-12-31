@@ -17,14 +17,14 @@ CREATE INDEX idx_ratings_rater_id ON ratings(rater_id);
 CREATE INDEX idx_ratings_rated_user_id ON ratings(rated_user_id);
 
 -- Function to get user's average rating
-CREATE OR REPLACE FUNCTION get_user_average_rating(user_id UUID)
+CREATE OR REPLACE FUNCTION get_user_average_rating(p_user_id UUID)
 RETURNS TABLE(average_rating NUMERIC, total_ratings BIGINT) AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    ROUND(AVG(rating)::NUMERIC, 2) as average_rating,
+    ROUND(AVG(r.rating)::NUMERIC, 2) as average_rating,
     COUNT(*) as total_ratings
-  FROM ratings
-  WHERE rated_user_id = user_id;
+  FROM public.ratings r
+  WHERE r.rated_user_id = p_user_id;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = '';

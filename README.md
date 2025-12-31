@@ -16,47 +16,88 @@ A mobile app where users create sports matches, others request to join, get appr
 
 - Node.js 18+
 - npm or yarn
+- Docker Desktop (must be running)
 - [Supabase CLI](https://supabase.com/docs/guides/cli)
-- Docker (for local Supabase)
 
-### Installation
+### Step 1: Install Dependencies
 
 ```bash
-# Install dependencies
+# Install project dependencies
 npm install
 
-# Install Supabase CLI (if not installed)
-npm install -g supabase
+# Install Supabase CLI via Homebrew (macOS)
+brew install supabase/tap/supabase
 ```
 
-### Environment Setup
+### Step 2: Start Docker
 
-1. Copy environment files:
+Make sure Docker Desktop is running before proceeding.
+
+### Step 3: Start Local Supabase
+
 ```bash
-cp .env.development.example .env.development
-cp .env.production.example .env.production
+npm run db:start
 ```
 
-2. Update with your Supabase credentials:
+This will start a local Supabase instance. First run may take a few minutes to download Docker images.
+
+### Step 4: Create Environment File
+
+Create `.env.development` in the project root:
+
 ```bash
 # .env.development
-EXPO_PUBLIC_SUPABASE_URL=your-dev-url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your-dev-anon-key
+EXPO_PUBLIC_ENV=development
+EXPO_PUBLIC_SUPABASE_URL=http://localhost:54321
+EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your-dev-maps-key
 ```
+
+> **Note:** The anon key above is the standard local Supabase demo key. You can verify it by running `supabase status -o env`.
+
+### Step 5: Run Migrations
+
+```bash
+# Reset database and run all migrations
+npm run db:reset
+```
+
+### Step 6: Generate TypeScript Types
+
+```bash
+npm run db:types
+```
+
+This creates `src/types/database.types.ts` with type definitions for all tables.
+
+### Step 7: Verify Setup
+
+```bash
+# Check Supabase status
+supabase status
+```
+
+You should see:
+- **Studio:** http://127.0.0.1:54323 (Database UI)
+- **API:** http://127.0.0.1:54321
+- **Database:** postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+### Test Phone Numbers (Local Development)
+
+For testing phone OTP authentication locally, use these numbers with OTP code `123456`:
+- +201234567890
+- +201111111111
+- +201000000000
 
 ## Database
 
-### Local Development
+### Quick Reference
 
 ```bash
-# Start local Supabase (requires Docker)
-npm run db:start
-
-# Reset database and run all migrations
-npm run db:reset
-
-# Generate TypeScript types
-npm run db:types
+npm run db:start    # Start local Supabase
+npm run db:stop     # Stop local Supabase
+npm run db:reset    # Reset DB and run all migrations
+npm run db:types    # Generate TypeScript types
 ```
 
 ### Migration Commands

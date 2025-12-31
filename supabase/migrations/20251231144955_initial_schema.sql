@@ -2,8 +2,10 @@
 -- This migration sets up the foundational elements for the database
 
 -- Enable required extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "postgis";
+-- Note: Extensions are installed in 'extensions' schema by Supabase by default
+-- uuid-ossp is pre-installed by Supabase
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS "postgis" WITH SCHEMA extensions;
 
 -- Skill level enum
 CREATE TYPE skill_level AS ENUM ('beginner', 'intermediate', 'advanced', 'pro');
