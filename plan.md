@@ -121,10 +121,9 @@ supabase gen types typescript --local > src/types/database.types.ts
 │   ├── 20240102000000_add_profiles.sql
 │   ├── 20240103000000_add_matches.sql
 │   ├── 20240104000000_add_chat.sql
-│   ├── 20240105000000_add_teams.sql
-│   ├── 20240106000000_add_ratings.sql
-│   ├── 20240107000000_add_notifications.sql
-│   └── 20240108000000_add_rls_policies.sql
+│   ├── 20240105000000_add_ratings.sql
+│   ├── 20240106000000_add_notifications.sql
+│   └── 20240107000000_add_rls_policies.sql
 └── functions/
     ├── match-reminders/
     └── send-push/
@@ -584,11 +583,6 @@ export const shadows = {
 - Left border: 4px accent color (based on sport)
 - Slight rotation on press: rotate(-1deg) scale(0.98)
 
-// Team Card
-- Background: gradient (subtle, sport-themed)
-- BorderRadius: 24px
-- Avatar overlapping top edge by 20px
-
 // Chat Preview Card
 - Background: white
 - BorderRadius: 14px
@@ -822,7 +816,6 @@ export const a11y = {
 │   │   ├── _layout.tsx           # Tab navigator
 │   │   ├── discover/             # Match discovery (map + list)
 │   │   ├── calendar/             # Schedule view
-│   │   ├── teams/                # Teams management
 │   │   ├── messages/             # Chat rooms
 │   │   └── profile/              # User profile
 │   └── match/                    # Match modals
@@ -846,10 +839,9 @@ export const a11y = {
 │   │   ├── 20240102000000_add_profiles.sql
 │   │   ├── 20240103000000_add_matches.sql
 │   │   ├── 20240104000000_add_chat.sql
-│   │   ├── 20240105000000_add_teams.sql
-│   │   ├── 20240106000000_add_ratings.sql
-│   │   ├── 20240107000000_add_notifications.sql
-│   │   └── 20240108000000_add_rls_policies.sql
+│   │   ├── 20240105000000_add_ratings.sql
+│   │   ├── 20240106000000_add_notifications.sql
+│   │   └── 20240107000000_add_rls_policies.sql
 │   └── functions/
 │       ├── match-reminders/
 │       │   └── index.ts
@@ -908,23 +900,13 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 
 ### chat_rooms
 
-- id, match_id (or team_id)
+- id, match_id
 - is_active, last_message_at
 
 ### chat_messages
 
 - id, chat_room_id, sender_id
 - content, message_type, created_at
-
-### teams
-
-- id, name, sport_type, avatar_url
-- max_members, is_public
-
-### team_members
-
-- id, team_id, user_id
-- role (owner/admin/member)
 
 ### ratings
 
@@ -999,10 +981,9 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
    - `app/_layout.tsx` - Root layout with GestureHandlerRootView, providers, fonts
    - `app/(auth)/_layout.tsx` - Stack navigator for auth flow
    - `app/(auth)/index.tsx` - Phone input screen (placeholder)
-   - `app/(tabs)/_layout.tsx` - Tab navigator with 5 tabs
+   - `app/(tabs)/_layout.tsx` - Tab navigator with 4 tabs
    - `app/(tabs)/discover.tsx` - Discover tab (placeholder)
    - `app/(tabs)/calendar.tsx` - Calendar tab (placeholder)
-   - `app/(tabs)/teams.tsx` - Teams tab (placeholder)
    - `app/(tabs)/messages.tsx` - Messages tab (placeholder)
    - `app/(tabs)/profile.tsx` - Profile tab (placeholder)
    - Reason: File-based routing with Expo Router is simpler and provides type-safe navigation
@@ -1047,7 +1028,6 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 │       ├── _layout.tsx
 │       ├── discover.tsx
 │       ├── calendar.tsx
-│       ├── teams.tsx
 │       ├── messages.tsx
 │       └── profile.tsx
 ├── src/
@@ -1074,12 +1054,11 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 2. Create profiles table migration
 3. Create matches table migration
 4. Create chat tables migration
-5. Create teams tables migration
-6. Create ratings table migration
-7. Create notifications table migration
-8. Create RLS policies migration
-9. Create seed.sql for development data
-10. Generate TypeScript types from schema
+5. Create ratings table migration
+6. Create notifications table migration
+7. Create RLS policies migration
+8. Create seed.sql for development data
+9. Generate TypeScript types from schema
 
 **Files to create:**
 
@@ -1087,10 +1066,9 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 - `supabase/migrations/20240102000000_add_profiles.sql`
 - `supabase/migrations/20240103000000_add_matches.sql`
 - `supabase/migrations/20240104000000_add_chat.sql`
-- `supabase/migrations/20240105000000_add_teams.sql`
-- `supabase/migrations/20240106000000_add_ratings.sql`
-- `supabase/migrations/20240107000000_add_notifications.sql`
-- `supabase/migrations/20240108000000_add_rls_policies.sql`
+- `supabase/migrations/20240105000000_add_ratings.sql`
+- `supabase/migrations/20240106000000_add_notifications.sql`
+- `supabase/migrations/20240107000000_add_rls_policies.sql`
 - `supabase/seed.sql`
 - `src/types/database.types.ts` (auto-generated)
 
@@ -1160,23 +1138,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 - `src/components/chat/MessageBubble.tsx`
 - `src/components/chat/ChatInput.tsx`
 
-### Phase 6: Teams
-
-1. Create team form
-2. Team list (my teams)
-3. Team details + members
-4. Invite users
-5. Team chat room
-
-**Files to create:**
-
-- `app/(tabs)/teams/index.tsx`
-- `app/(tabs)/teams/create.tsx`
-- `app/(tabs)/teams/[teamId].tsx`
-- `src/services/team.service.ts`
-- `src/hooks/useTeams.ts`
-
-### Phase 7: Ratings & Reviews
+### Phase 6: Ratings & Reviews
 
 1. Post-match rating prompt
 2. Rate participants modal
@@ -1191,7 +1153,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 - `src/components/rating/StarRating.tsx`
 - `src/components/rating/RatingModal.tsx`
 
-### Phase 8: Friends
+### Phase 7: Friends
 
 1. Send/receive friend requests
 2. Friends list screen
@@ -1209,7 +1171,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 - `src/components/friends/FriendRequestCard.tsx`
 - `src/components/friends/FriendsList.tsx`
 
-### Phase 9: Calendar & Scheduling
+### Phase 8: Calendar & Scheduling
 
 1. Calendar view with matches
 2. Upcoming matches list
@@ -1223,7 +1185,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 - `src/services/notification.service.ts`
 - `supabase/functions/match-reminders/index.ts`
 
-### Phase 10: Profile & Settings
+### Phase 9: Profile & Settings
 
 1. Profile view (own + others)
 2. Edit profile
@@ -1237,7 +1199,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 - `app/(tabs)/profile/edit.tsx`
 - `app/(tabs)/profile/settings.tsx`
 
-### Phase 11: Polish & Launch
+### Phase 10: Polish & Launch
 
 1. Loading states and error handling
 2. Empty states
@@ -1245,7 +1207,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 4. App icon and splash screen
 5. Build for iOS and Android
 
-### Phase 12: CI/CD & Deployment
+### Phase 11: CI/CD & Deployment
 
 1. Set up GitHub repository
 2. Configure GitHub Actions for production migrations
@@ -1290,7 +1252,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 ### State Management
 
 - **Zustand**: Auth state, location, filters (client-only state)
-- **React Query**: Matches, chat, teams, ratings (server state)
+- **React Query**: Matches, chat, ratings (server state)
 - Separation prevents sync issues and enables proper caching
 
 ---

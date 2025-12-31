@@ -43,15 +43,6 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="teams"
-        options={{
-          title: 'Teams',
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon focused={focused} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="messages"
         options={{
           title: 'Messages',
