@@ -131,14 +131,14 @@ supabase gen types typescript --local > src/types/database.types.ts
 ├── config.toml                    # Supabase config
 ├── seed.sql                       # Seed data for development
 ├── migrations/
-│   ├── <timestamp>_initial_schema.sql
-│   ├── <timestamp>_add_cities.sql
-│   ├── <timestamp>_add_profiles.sql
-│   ├── <timestamp>_add_matches.sql
-│   ├── <timestamp>_add_chat.sql
-│   ├── <timestamp>_add_ratings.sql
-│   ├── <timestamp>_add_notifications.sql
-│   └── <timestamp>_add_rls_policies.sql
+│   ├── 20251231144955_initial_schema.sql
+│   ├── 20251231145000_add_cities.sql
+│   ├── 20251231145100_add_profiles.sql
+│   ├── 20251231145200_add_matches.sql
+│   ├── 20251231145300_add_chat.sql
+│   ├── 20251231145400_add_ratings.sql
+│   ├── 20251231145500_add_social.sql
+│   └── 20251231145600_add_rls_policies.sql
 └── functions/
     ├── match-reminders/
     └── send-push/
@@ -885,7 +885,7 @@ Seeded with: Sheikh Zayed, New Cairo, Maadi
 - id, name, icon, color
 - is_active (for soft delete/disable)
 
-Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Swimming, Other
+Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, Golf, Badminton, Squash, Pickleball, Spikeball
 
 ### profiles
 
@@ -1074,36 +1074,36 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 - Update `.env.development` and `.env.production` with real Supabase URLs and anon keys
 - (Optional) Add Google Maps API keys to `app.json`
 
-### Phase 1.5: Database Migrations
+### Phase 1.5: Database Migrations ✅ COMPLETED
 
-1. Create initial schema migration (extensions, enums)
-2. Create cities table migration (with seed data for Sheikh Zayed, New Cairo, Maadi)
-3. Create profiles table migration
-4. Create matches table migration (includes city_id foreign key)
-5. Create chat tables migration
-6. Create ratings table migration
-7. Create notifications table migration
-8. Create RLS policies migration
-9. Create seed.sql for development data
-10. Generate TypeScript types from schema
-11. Add npm scripts for migration commands
-12. Create GitHub Actions workflow for CI/CD migrations
+#### What Was Done
 
-**Migration npm scripts (add to package.json):**
+1. **Created migration files with proper timestamps:**
+   - `20251231144955_initial_schema.sql` - Extensions (uuid-ossp, postgis) and enums (skill_level, match_status, participant_status, friendship_status, message_type)
+   - `20251231145000_add_cities.sql` - Cities table with seed data (Sheikh Zayed, New Cairo, Maadi)
+   - `20251231145100_add_profiles.sql` - Sports table, profiles table, user_sports table, auto-create profile trigger
+   - `20251231145200_add_matches.sql` - Matches table, match_participants table, location validation trigger, get_nearby_matches function
+   - `20251231145300_add_chat.sql` - Chat rooms and messages tables, auto-create chat room trigger
+   - `20251231145400_add_ratings.sql` - Ratings table, get_user_average_rating function
+   - `20251231145500_add_social.sql` - User blocks and friendships tables, helper functions
+   - `20251231145600_add_rls_policies.sql` - Row-level security policies for all tables
 
-```json
-{
-  "scripts": {
-    "db:start": "supabase start",
-    "db:stop": "supabase stop",
-    "db:reset": "supabase db reset",
-    "db:migrate": "supabase db push",
-    "db:migrate:status": "supabase migration list",
-    "db:migrate:new": "supabase migration new",
-    "db:types": "supabase gen types typescript --local > src/types/database.types.ts"
-  }
-}
-```
+2. **Created seed.sql** - Template for development test data
+
+3. **Added npm scripts to package.json:**
+   ```json
+   {
+     "db:start": "supabase start",
+     "db:stop": "supabase stop",
+     "db:reset": "supabase db reset",
+     "db:migrate": "supabase db push",
+     "db:migrate:status": "supabase migration list",
+     "db:migrate:new": "supabase migration new",
+     "db:types": "supabase gen types typescript --local > src/types/database.types.ts"
+   }
+   ```
+
+4. **Created GitHub Actions workflow** - `.github/workflows/migrate-production.yml` for CI/CD migrations
 
 **How migration tracking works:**
 - Supabase tracks applied migrations in `supabase_migrations.schema_migrations` table
@@ -1111,21 +1111,22 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 - `npm run db:migrate` runs only pending migrations on remote
 - `npm run db:reset` resets local DB and runs all migrations from scratch
 
-**Files to create:**
+#### Files Created
 
-> **Note:** Timestamps below are placeholders for ordering. Actual files will be created using `supabase migration new <name>` which generates real timestamps (e.g., `20251231150000_add_cities.sql`).
-
-- `supabase/migrations/<timestamp>_initial_schema.sql`
-- `supabase/migrations/<timestamp>_add_cities.sql`
-- `supabase/migrations/<timestamp>_add_profiles.sql`
-- `supabase/migrations/<timestamp>_add_matches.sql`
-- `supabase/migrations/<timestamp>_add_chat.sql`
-- `supabase/migrations/<timestamp>_add_ratings.sql`
-- `supabase/migrations/<timestamp>_add_notifications.sql`
-- `supabase/migrations/<timestamp>_add_rls_policies.sql`
+- `supabase/migrations/20251231144955_initial_schema.sql`
+- `supabase/migrations/20251231145000_add_cities.sql`
+- `supabase/migrations/20251231145100_add_profiles.sql`
+- `supabase/migrations/20251231145200_add_matches.sql`
+- `supabase/migrations/20251231145300_add_chat.sql`
+- `supabase/migrations/20251231145400_add_ratings.sql`
+- `supabase/migrations/20251231145500_add_social.sql`
+- `supabase/migrations/20251231145600_add_rls_policies.sql`
 - `supabase/seed.sql`
-- `src/types/database.types.ts` (auto-generated)
 - `.github/workflows/migrate-production.yml`
+
+#### Pending
+
+- Generate TypeScript types after running migrations locally (`npm run db:types`)
 
 ### Phase 2: Authentication
 
