@@ -7,8 +7,22 @@ A mobile app where users create sports matches, others request to join, get appr
 ## Target Market
 
 - **Region**: Egypt only (initial launch)
-- **Cities**: Cairo and surrounding areas (Giza, 6th of October, New Cairo, Maadi, Heliopolis, etc.)
+- **Supported Cities**: Sheikh Zayed, New Cairo, and Maadi only (initial launch)
 - **Platforms**: iOS + Android
+
+### Supported Locations (Phase 1)
+
+| City | Approximate Bounds |
+|------|-------------------|
+| Sheikh Zayed | 30.0°N - 30.1°N, 30.9°E - 31.0°E |
+| New Cairo | 29.98°N - 30.08°N, 31.4°E - 31.55°E |
+| Maadi | 29.95°N - 30.02°N, 31.23°E - 31.32°E |
+
+**Location Enforcement:**
+- Match creation restricted to supported city boundaries
+- Map view defaults to user's nearest supported city
+- Users outside supported areas can browse but must select a supported location for matches
+- City expansion planned for future phases (6th of October, Heliopolis, etc.)
 
 ## Technology Stack
 
@@ -118,12 +132,13 @@ supabase gen types typescript --local > src/types/database.types.ts
 ├── seed.sql                       # Seed data for development
 ├── migrations/
 │   ├── 20240101000000_initial_schema.sql
-│   ├── 20240102000000_add_profiles.sql
-│   ├── 20240103000000_add_matches.sql
-│   ├── 20240104000000_add_chat.sql
-│   ├── 20240105000000_add_ratings.sql
-│   ├── 20240106000000_add_notifications.sql
-│   └── 20240107000000_add_rls_policies.sql
+│   ├── 20240102000000_add_cities.sql
+│   ├── 20240103000000_add_profiles.sql
+│   ├── 20240104000000_add_matches.sql
+│   ├── 20240105000000_add_chat.sql
+│   ├── 20240106000000_add_ratings.sql
+│   ├── 20240107000000_add_notifications.sql
+│   └── 20240108000000_add_rls_policies.sql
 └── functions/
     ├── match-reminders/
     └── send-push/
@@ -178,7 +193,7 @@ jobs:
 2. **Match Discovery** - Map view + list view, location-based, filterable
 3. **Join Requests** - Request to join, creator approves/rejects
 4. **Group Chat** - Real-time chat for approved participants only
-5. **Scheduling** - Calendar view, recurring matches, reminders
+5. **Scheduling** - Calendar view, reminders
 6. **Ratings** - Rate players after match completion
 7. **Friends** - Add other users as friends, see their matches
 8. **Safety** - Block/report users, manual review
@@ -856,6 +871,15 @@ export const a11y = {
 
 ## Database Schema (Key Tables)
 
+### cities
+
+- id (UUID), name, name_ar (Arabic name, optional)
+- bounds (JSONB) - { north, south, east, west } coordinates
+- center (geography POINT) - default map center for the city
+- is_active (boolean) - can disable without deleting
+
+Seeded with: Sheikh Zayed, New Cairo, Maadi
+
 ### sports
 
 - id, name, icon, color
@@ -866,8 +890,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 ### profiles
 
 - id (UUID, references auth.users.id)
-- phone_number, display_name, avatar_url, bio
-- home_location (geography), city
+- phone_number, display_name, avatar_url
 - expo_push_token
 
 **Link to auth.users**: A database trigger (`on_auth_user_created`) automatically creates a profile row when a user signs up. The `id` is the same as `auth.users.id`.
@@ -884,13 +907,16 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 
 - id, creator_id, title, description
 - sport_id (references sports), skill_level (enum, nullable - open to all if null)
+- city_id (references cities) - required, enforces supported locations
 - location (geography), location_name
 - scheduled_at, duration_minutes
-- max_players, current_players
+- max_players
 - status (upcoming/in_progress/completed/cancelled)
-- requires_approval, recurrence
+- requires_approval
 
-**Constraint**: A user can only have 1 active match (status = upcoming/in_progress) as creator at a time. Enforced via RLS policy to prevent spam.
+**Constraints**:
+- A user can only have 1 active match (status = upcoming/in_progress) as creator at a time. Enforced via RLS policy to prevent spam.
+- Match location must fall within the referenced city's bounds (validated on insert/update).
 
 ### match_participants
 
@@ -1051,24 +1077,26 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 ### Phase 1.5: Database Migrations
 
 1. Create initial schema migration (extensions, enums)
-2. Create profiles table migration
-3. Create matches table migration
-4. Create chat tables migration
-5. Create ratings table migration
-6. Create notifications table migration
-7. Create RLS policies migration
-8. Create seed.sql for development data
-9. Generate TypeScript types from schema
+2. Create cities table migration (with seed data for Sheikh Zayed, New Cairo, Maadi)
+3. Create profiles table migration
+4. Create matches table migration (includes city_id foreign key)
+5. Create chat tables migration
+6. Create ratings table migration
+7. Create notifications table migration
+8. Create RLS policies migration
+9. Create seed.sql for development data
+10. Generate TypeScript types from schema
 
 **Files to create:**
 
 - `supabase/migrations/20240101000000_initial_schema.sql`
-- `supabase/migrations/20240102000000_add_profiles.sql`
-- `supabase/migrations/20240103000000_add_matches.sql`
-- `supabase/migrations/20240104000000_add_chat.sql`
-- `supabase/migrations/20240105000000_add_ratings.sql`
-- `supabase/migrations/20240106000000_add_notifications.sql`
-- `supabase/migrations/20240107000000_add_rls_policies.sql`
+- `supabase/migrations/20240102000000_add_cities.sql`
+- `supabase/migrations/20240103000000_add_profiles.sql`
+- `supabase/migrations/20240104000000_add_matches.sql`
+- `supabase/migrations/20240105000000_add_chat.sql`
+- `supabase/migrations/20240106000000_add_ratings.sql`
+- `supabase/migrations/20240107000000_add_notifications.sql`
+- `supabase/migrations/20240108000000_add_rls_policies.sql`
 - `supabase/seed.sql`
 - `src/types/database.types.ts` (auto-generated)
 
@@ -1175,9 +1203,8 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Fitness, Padel, Sw
 
 1. Calendar view with matches
 2. Upcoming matches list
-3. Recurring match setup
-4. Push notification reminders
-5. Match reminder edge function
+3. Push notification reminders
+4. Match reminder edge function
 
 **Files to create:**
 
