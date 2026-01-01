@@ -28,7 +28,7 @@ A mobile app where users create sports matches, others request to join, get appr
 
 - **Frontend**: React Native with Expo (TypeScript)
 - **Backend**: Supabase (PostgreSQL, Auth, Realtime, Storage)
-- **Auth**: Phone number OTP only
+- **Auth**: Email OTP (magic link)
 - **State**: Zustand (UI state) + React Query (server state)
 - **Maps**: react-native-maps + expo-location
 - **Forms**: react-hook-form + zod
@@ -138,7 +138,8 @@ supabase gen types typescript --local > src/types/database.types.ts
 │   ├── 20251231145300_add_chat.sql
 │   ├── 20251231145400_add_ratings.sql
 │   ├── 20251231145500_add_social.sql
-│   └── 20251231145600_add_rls_policies.sql
+│   ├── 20251231145600_add_rls_policies.sql
+│   └── 20260101000000_email_auth.sql    # Email OTP auth migration
 └── functions/
     ├── match-reminders/
     └── send-push/
@@ -824,9 +825,9 @@ export const a11y = {
 │   ├── _layout.tsx               # Root layout
 │   ├── (auth)/                   # Auth flow (public)
 │   │   ├── _layout.tsx
-│   │   ├── index.tsx             # Phone input
-│   │   ├── verify.tsx            # OTP verification
-│   │   └── onboarding.tsx        # Profile setup
+│   │   ├── index.tsx             # Email input screen
+│   │   ├── verify.tsx            # Check your email / verification
+│   │   └── onboarding.tsx        # Profile setup (name, avatar, sports)
 │   ├── (tabs)/                   # Main app (authenticated)
 │   │   ├── _layout.tsx           # Tab navigator
 │   │   ├── discover/             # Match discovery (map + list)
@@ -839,8 +840,13 @@ export const a11y = {
 ├── src/
 │   ├── components/               # UI components
 │   ├── hooks/                    # Custom hooks
+│   ├── lib/                      # Libraries and utilities
+│   │   └── validations/          # Zod schemas
+│   │       └── auth.ts           # Auth form validations
 │   ├── stores/                   # Zustand stores
 │   ├── services/                 # Supabase API services
+│   │   ├── supabase.ts           # Supabase client
+│   │   └── auth.ts               # Auth service (Email OTP)
 │   ├── types/                    # TypeScript types
 │   │   └── database.types.ts     # Auto-generated from Supabase
 │   ├── utils/                    # Utilities
@@ -850,13 +856,15 @@ export const a11y = {
 │   ├── config.toml               # Supabase local config
 │   ├── seed.sql                  # Dev seed data
 │   ├── migrations/
-│   │   ├── 20240101000000_initial_schema.sql
-│   │   ├── 20240102000000_add_profiles.sql
-│   │   ├── 20240103000000_add_matches.sql
-│   │   ├── 20240104000000_add_chat.sql
-│   │   ├── 20240105000000_add_ratings.sql
-│   │   ├── 20240106000000_add_notifications.sql
-│   │   └── 20240107000000_add_rls_policies.sql
+│   │   ├── 20251231144955_initial_schema.sql
+│   │   ├── 20251231145000_add_cities.sql
+│   │   ├── 20251231145100_add_profiles.sql
+│   │   ├── 20251231145200_add_matches.sql
+│   │   ├── 20251231145300_add_chat.sql
+│   │   ├── 20251231145400_add_ratings.sql
+│   │   ├── 20251231145500_add_social.sql
+│   │   ├── 20251231145600_add_rls_policies.sql
+│   │   └── 20260101000000_email_auth.sql    # Email OTP auth migration
 │   └── functions/
 │       ├── match-reminders/
 │       │   └── index.ts
@@ -874,8 +882,6 @@ export const a11y = {
 ### cities
 
 - id (UUID), name, name_ar (Arabic name, optional)
-- bounds (JSONB) - { north, south, east, west } coordinates
-- center (geography POINT) - default map center for the city
 - is_active (boolean) - can disable without deleting
 
 Seeded with: Sheikh Zayed, New Cairo, Maadi
@@ -890,10 +896,10 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 ### profiles
 
 - id (UUID, references auth.users.id)
-- phone_number, display_name, avatar_url
+- email, display_name, avatar_url
 - expo_push_token
 
-**Link to auth.users**: A database trigger (`on_auth_user_created`) automatically creates a profile row when a user signs up. The `id` is the same as `auth.users.id`.
+**Link to auth.users**: A database trigger (`on_auth_user_created`) automatically creates a profile row when a user signs up. The `id` is the same as `auth.users.id`. For OAuth users (Google/Apple), the trigger extracts display_name and avatar_url from provider metadata.
 
 ### user_sports
 
@@ -908,7 +914,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 - id, creator_id, title, description
 - sport_id (references sports), skill_level (enum, nullable - open to all if null)
 - city_id (references cities) - required, enforces supported locations
-- location (geography), location_name
+- location_name, location_url (Google Maps URL, optional)
 - scheduled_at, duration_minutes
 - max_players
 - status (upcoming/in_progress/completed/cancelled)
@@ -916,7 +922,6 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 
 **Constraints**:
 - A user can only have 1 active match (status = upcoming/in_progress) as creator at a time. Enforced via RLS policy to prevent spam.
-- Match location must fall within the referenced city's bounds (validated on insert/update).
 
 ### match_participants
 
@@ -995,7 +1000,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 6. **Created Supabase client (src/services/supabase.ts)**
    - Uses `expo-secure-store` for auth token storage (encrypted on device)
    - Configured with `autoRefreshToken`, `persistSession`
-   - Set `detectSessionInUrl: false` (not needed for mobile)
+   - Set `detectSessionInUrl: true` (required for OAuth deep link callbacks)
    - Reason: Secure token storage is critical for mobile apps, SecureStore uses Keychain (iOS) and Keystore (Android)
 
 7. **Created environment config helper (src/config/env.ts)**
@@ -1006,7 +1011,7 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 8. **Set up Expo Router structure**
    - `app/_layout.tsx` - Root layout with GestureHandlerRootView, providers, fonts
    - `app/(auth)/_layout.tsx` - Stack navigator for auth flow
-   - `app/(auth)/index.tsx` - Phone input screen (placeholder)
+   - `app/(auth)/index.tsx` - Welcome screen with auth options (placeholder)
    - `app/(tabs)/_layout.tsx` - Tab navigator with 4 tabs
    - `app/(tabs)/discover.tsx` - Discover tab (placeholder)
    - `app/(tabs)/calendar.tsx` - Calendar tab (placeholder)
@@ -1032,7 +1037,8 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 
 12. **Created supabase/config.toml**
     - Local Supabase config for development
-    - SMS auth enabled for phone OTP
+    - Email auth enabled with confirmations
+    - Google and Apple OAuth providers configured
     - Site URL set to `ballers://` for deep links
     - Reason: Enables local Supabase development with `supabase start`
 
@@ -1126,23 +1132,86 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 
 #### Pending
 
+- Create `supabase/migrations/20260101000000_email_auth.sql` (Email OTP auth migration)
 - Generate TypeScript types after running migrations locally (`npm run db:types`)
 
 ### Phase 2: Authentication
 
-1. Phone OTP sign-in screen
-2. OTP verification screen
-3. Onboarding flow (name, avatar, preferences)
-4. Auth state management with Zustand
-5. Protected routes
+#### Auth Method
+- **Email OTP (Magic Link)** - User enters email, receives a sign-in link, clicks to authenticate
 
-**Files to create:**
+#### Implementation Steps
 
-- `app/(auth)/index.tsx` - Phone input
-- `app/(auth)/verify.tsx` - OTP verification
-- `app/(auth)/onboarding.tsx` - Profile setup
-- `src/services/auth.service.ts`
-- `src/stores/authStore.ts`
+1. Update Supabase config for email OTP
+2. Create auth service with email OTP methods
+3. Build auth screens (Email input, OTP verification)
+4. Onboarding flow (name, avatar, sport preferences)
+5. Protected routes based on auth state
+
+#### Auth Flow
+
+```
+Welcome → Enter Email → supabase.auth.signInWithOtp() → Check Email → Click Magic Link → Session → Onboarding (if new user)
+```
+
+#### Files to Create/Modify
+
+**New Files:**
+- `app/(auth)/index.tsx` - Email input screen
+- `app/(auth)/verify.tsx` - Check your email / OTP verification screen
+- `app/(auth)/onboarding.tsx` - Profile setup (name, avatar, sports)
+- `src/services/auth.ts` - Auth service with email OTP methods
+- `src/lib/validations/auth.ts` - Zod schemas for email validation
+- `supabase/migrations/20260101000000_email_auth.sql` - Remove phone_number, update trigger
+
+**Files to Modify:**
+- `app/(auth)/_layout.tsx` - Register auth screens
+- `src/services/supabase.ts` - Enable `detectSessionInUrl: true`
+- `src/providers/AuthProvider.tsx` - Add auth methods, handle deep links
+- `supabase/config.toml` - Enable email OTP
+
+#### Supabase Config Changes
+
+```toml
+# Disable SMS auth
+[auth.sms]
+enable_signup = false
+enable_confirmations = false
+
+# Enable email OTP (magic link)
+[auth.email]
+enable_signup = true
+enable_confirmations = false  # No confirmation needed for OTP
+```
+
+#### Database Migration (20260101000000_email_auth.sql)
+
+```sql
+-- Remove phone_number, add email to profiles
+ALTER TABLE profiles DROP COLUMN IF EXISTS phone_number;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email TEXT;
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email) WHERE email IS NOT NULL;
+
+-- Update trigger for email users
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, display_name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    split_part(NEW.email, '@', 1)  -- Default display name from email
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+```
+
+#### Notes
+
+- **Works in Expo Go** - No native modules required for email OTP
+- **Deep links** - Required for magic link callbacks
+- **Use frontend-design skill** - For all auth screens per project design requirements
 
 ### Phase 3: Location & Discovery
 
@@ -1293,9 +1362,9 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 
 ### Location Queries
 
-- PostGIS extension for geospatial queries
-- `get_nearby_matches()` database function for efficient radius search
-- GIST index on location columns
+- Matches filtered by city_id (no geospatial queries for now)
+- Location stored as name + optional Google Maps URL
+- "Find nearby matches" can be added later if needed
 
 ### Row Level Security
 
@@ -1329,6 +1398,8 @@ npx expo install expo-notifications expo-device
 
 # UI
 npx expo install react-native-gesture-handler react-native-reanimated
+
+# Auth (Email OTP uses Supabase's built-in auth, no additional packages needed)
 
 # State & Data
 npm install zustand @tanstack/react-query

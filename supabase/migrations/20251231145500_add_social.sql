@@ -1,7 +1,5 @@
 -- Social features: friendships and user blocks
 
-SET search_path TO public, extensions;
-
 -- User blocks table
 CREATE TABLE user_blocks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

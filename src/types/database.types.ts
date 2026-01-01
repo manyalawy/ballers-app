@@ -110,8 +110,6 @@ export type Database = {
       }
       cities: {
         Row: {
-          bounds: Json
-          center: unknown
           created_at: string | null
           id: string
           is_active: boolean | null
@@ -119,8 +117,6 @@ export type Database = {
           name_ar: string | null
         }
         Insert: {
-          bounds: Json
-          center: unknown
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -128,8 +124,6 @@ export type Database = {
           name_ar?: string | null
         }
         Update: {
-          bounds?: Json
-          center?: unknown
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -233,8 +227,8 @@ export type Database = {
           description: string | null
           duration_minutes: number
           id: string
-          location: unknown
           location_name: string
+          location_url: string | null
           max_players: number
           requires_approval: boolean
           scheduled_at: string
@@ -251,8 +245,8 @@ export type Database = {
           description?: string | null
           duration_minutes?: number
           id?: string
-          location: unknown
           location_name: string
+          location_url?: string | null
           max_players?: number
           requires_approval?: boolean
           scheduled_at: string
@@ -269,8 +263,8 @@ export type Database = {
           description?: string | null
           duration_minutes?: number
           id?: string
-          location?: unknown
           location_name?: string
+          location_url?: string | null
           max_players?: number
           requires_approval?: boolean
           scheduled_at?: string
@@ -309,27 +303,27 @@ export type Database = {
           avatar_url: string | null
           created_at: string | null
           display_name: string | null
+          email: string | null
           expo_push_token: string | null
           id: string
-          phone_number: string | null
           updated_at: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
           display_name?: string | null
+          email?: string | null
           expo_push_token?: string | null
           id: string
-          phone_number?: string | null
           updated_at?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string | null
           display_name?: string | null
+          email?: string | null
           expo_push_token?: string | null
           id?: string
-          phone_number?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -499,38 +493,6 @@ export type Database = {
       are_friends: {
         Args: { user1_id: string; user2_id: string }
         Returns: boolean
-      }
-      get_nearby_matches: {
-        Args: {
-          radius_meters?: number
-          skill_filter?: Database["public"]["Enums"]["skill_level"]
-          sport_filter?: string
-          user_location: unknown
-        }
-        Returns: {
-          city_id: string
-          created_at: string | null
-          creator_id: string
-          description: string | null
-          duration_minutes: number
-          id: string
-          location: unknown
-          location_name: string
-          max_players: number
-          requires_approval: boolean
-          scheduled_at: string
-          skill_level: Database["public"]["Enums"]["skill_level"] | null
-          sport_id: string
-          status: Database["public"]["Enums"]["match_status"]
-          title: string
-          updated_at: string | null
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "matches"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_user_average_rating: {
         Args: { p_user_id: string }

@@ -1,7 +1,5 @@
 -- Profiles and user sports tables
 
-SET search_path TO public, extensions;
-
 -- Sports table (reference data)
 CREATE TABLE sports (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

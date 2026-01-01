@@ -1,7 +1,5 @@
 -- Ratings table for post-match reviews
 
-SET search_path TO public, extensions;
-
 CREATE TABLE ratings (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   match_id UUID NOT NULL REFERENCES matches(id) ON DELETE CASCADE,

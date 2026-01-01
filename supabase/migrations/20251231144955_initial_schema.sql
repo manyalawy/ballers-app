@@ -1,12 +1,3 @@
--- Initial schema: Extensions and Enums
--- This migration sets up the foundational elements for the database
-
--- Enable required extensions
--- Note: On Supabase hosted, extensions may already be enabled via dashboard
--- Don't specify schema to avoid conflicts with pre-installed extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "postgis";
-
 -- Skill level enum
 CREATE TYPE skill_level AS ENUM ('beginner', 'intermediate', 'advanced', 'pro');
 

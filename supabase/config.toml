@@ -31,26 +31,27 @@ file_size_limit = "50MiB"
 [auth]
 enabled = true
 site_url = "ballers://"
-additional_redirect_urls = ["ballers://"]
+additional_redirect_urls = ["ballers://", "ballers://auth/callback", "exp://localhost:8081/--/auth/callback"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 enable_signup = true
 
+# Disable SMS auth (using Email OTP instead)
 [auth.sms]
+enable_signup = false
+enable_confirmations = false
+
+# Enable email OTP (magic link)
+[auth.email]
 enable_signup = true
-enable_confirmations = true
+double_confirm_changes = false
+enable_confirmations = false  # No confirmation needed for OTP flow
+max_frequency = "60s"  # Rate limit: 1 email per 60 seconds
 
-[auth.sms.test_otp]
-"+201234567890" = "123456"
-"+201111111111" = "123456"
-"+201000000000" = "123456"
-
-[auth.sms.twilio]
-enabled = false
-account_sid = ""
-message_service_sid = ""
-auth_token = ""
+# Email templates (for local development, uses Inbucket at http://localhost:54324)
+[auth.email.template.magic_link]
+subject = "Sign in to Ballers"
 
 [realtime]
 enabled = true
