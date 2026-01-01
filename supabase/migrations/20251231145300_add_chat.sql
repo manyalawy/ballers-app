@@ -1,7 +1,7 @@
 -- Chat rooms and messages tables
 
 CREATE TABLE chat_rooms (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   match_id UUID NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
   is_active BOOLEAN DEFAULT true,
   last_message_at TIMESTAMPTZ,
@@ -14,7 +14,7 @@ CREATE INDEX idx_chat_rooms_match_id ON chat_rooms(match_id);
 CREATE INDEX idx_chat_rooms_last_message_at ON chat_rooms(last_message_at DESC);
 
 CREATE TABLE chat_messages (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   chat_room_id UUID NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
   sender_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   content TEXT NOT NULL,

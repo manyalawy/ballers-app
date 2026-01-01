@@ -2,7 +2,7 @@
 
 -- User blocks table
 CREATE TABLE user_blocks (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   blocker_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   blocked_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   reason TEXT,
@@ -17,7 +17,7 @@ CREATE INDEX idx_user_blocks_blocked_id ON user_blocks(blocked_id);
 
 -- Friendships table
 CREATE TABLE friendships (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   requester_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   addressee_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   status friendship_status NOT NULL DEFAULT 'pending',

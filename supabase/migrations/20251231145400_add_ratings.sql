@@ -1,7 +1,7 @@
 -- Ratings table for post-match reviews
 
 CREATE TABLE ratings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   match_id UUID NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
   rater_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   rated_user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,

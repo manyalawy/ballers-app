@@ -2,7 +2,7 @@
 
 -- Sports table (reference data)
 CREATE TABLE sports (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
   icon TEXT,
   color TEXT,
@@ -41,7 +41,7 @@ CREATE INDEX idx_profiles_expo_push_token ON profiles(expo_push_token) WHERE exp
 
 -- User sports (skill levels per sport)
 CREATE TABLE user_sports (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   sport_id UUID NOT NULL REFERENCES sports(id) ON DELETE CASCADE,
   skill_level skill_level NOT NULL,
