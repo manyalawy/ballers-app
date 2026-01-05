@@ -201,611 +201,9 @@ jobs:
 
 ## Design Style
 
-**Aesthetic Direction: "Athletic Elegance"**
-A refined, premium sports experience that feels like a luxury fitness club meets modern tech. Clean but not sterile, sporty but sophisticated. The design should feel aspirational - like joining an exclusive community of active people.
+The app should have a **minimal, modern, clean, and luxurious** aesthetic. Use the `frontend-design` skill when implementing UI components to ensure high-quality, distinctive interfaces.
 
-**Memorable Element**: Subtle diagonal accents and dynamic card tilts that evoke motion and energy without being aggressive.
-
----
-
-## UI/UX Design Plan
-
-> **IMPORTANT**: Use the `frontend-design` skill when implementing ALL UI components.
-> This ensures distinctive, production-grade interfaces that avoid generic AI aesthetics.
-> Every screen and component should be built using this skill for consistency.
-
-### Design System
-
-#### Color Palette (Light Mode)
-
-```typescript
-// src/constants/colors.ts
-export const colors = {
-  // Primary - Deep Teal (trust, activity, freshness)
-  primary: {
-    50: "#E6F7F7",
-    100: "#B3E8E8",
-    200: "#80D9D9",
-    300: "#4DC9C9",
-    400: "#26BABA",
-    500: "#0D9488", // Main primary
-    600: "#0B7A70",
-    700: "#086058",
-    800: "#064640",
-    900: "#032D28",
-  },
-
-  // Accent - Electric Orange (energy, CTAs, urgency)
-  accent: {
-    50: "#FFF4ED",
-    100: "#FFE0CC",
-    200: "#FFCBAB",
-    300: "#FFB78A",
-    400: "#FFA369",
-    500: "#F97316", // Main accent
-    600: "#D9610F",
-    700: "#B34F0C",
-    800: "#8C3D09",
-    900: "#662C06",
-  },
-
-  // Success - Emerald
-  success: {
-    light: "#D1FAE5",
-    main: "#10B981",
-    dark: "#047857",
-  },
-
-  // Warning - Amber
-  warning: {
-    light: "#FEF3C7",
-    main: "#F59E0B",
-    dark: "#B45309",
-  },
-
-  // Error - Rose
-  error: {
-    light: "#FFE4E6",
-    main: "#F43F5E",
-    dark: "#BE123C",
-  },
-
-  // Neutrals - Warm Gray (not pure gray)
-  neutral: {
-    0: "#FFFFFF",
-    50: "#FAFAF9",
-    100: "#F5F5F4",
-    200: "#E7E5E4",
-    300: "#D6D3D1",
-    400: "#A8A29E",
-    500: "#78716C",
-    600: "#57534E",
-    700: "#44403C",
-    800: "#292524",
-    900: "#1C1917",
-  },
-
-  // Skill Level Colors
-  skill: {
-    beginner: "#22C55E", // Green
-    intermediate: "#3B82F6", // Blue
-    advanced: "#A855F7", // Purple
-    pro: "#EF4444", // Red
-  },
-
-  // Sport Category Colors (for icons/badges)
-  sport: {
-    basketball: "#F97316",
-    soccer: "#22C55E",
-    tennis: "#FBBF24",
-    volleyball: "#3B82F6",
-    running: "#EC4899",
-    fitness: "#8B5CF6",
-    other: "#6B7280",
-  },
-};
-```
-
-#### Color Palette (Dark Mode)
-
-```typescript
-export const darkColors = {
-  primary: {
-    ...colors.primary,
-    500: "#14B8A6", // Slightly brighter for dark mode
-  },
-  accent: colors.accent, // Keep accent vibrant
-
-  neutral: {
-    0: "#1C1917",
-    50: "#292524",
-    100: "#44403C",
-    200: "#57534E",
-    300: "#78716C",
-    400: "#A8A29E",
-    500: "#D6D3D1",
-    600: "#E7E5E4",
-    700: "#F5F5F4",
-    800: "#FAFAF9",
-    900: "#FFFFFF",
-  },
-
-  // Backgrounds
-  background: {
-    primary: "#0F0F0F",
-    secondary: "#1A1A1A",
-    tertiary: "#262626",
-    elevated: "#2D2D2D",
-  },
-};
-```
-
-#### Typography
-
-```typescript
-// src/constants/typography.ts
-// Using Manrope (geometric, sporty) + Plus Jakarta Sans (readable, modern)
-// Install: expo install @expo-google-fonts/manrope @expo-google-fonts/plus-jakarta-sans
-
-export const fonts = {
-  // Display/Headlines - Manrope (bold, geometric, sporty feel)
-  heading: {
-    family: "Manrope",
-    weights: {
-      semibold: "600",
-      bold: "700",
-      extrabold: "800",
-    },
-  },
-
-  // Body/UI - Plus Jakarta Sans (excellent readability)
-  body: {
-    family: "PlusJakartaSans",
-    weights: {
-      regular: "400",
-      medium: "500",
-      semibold: "600",
-      bold: "700",
-    },
-  },
-
-  // Monospace (for stats, numbers)
-  mono: {
-    family: "JetBrainsMono", // or system monospace
-    weights: {
-      medium: "500",
-    },
-  },
-};
-
-export const fontSize = {
-  // Display
-  display1: 40, // Hero headlines
-  display2: 32, // Section titles
-
-  // Headings
-  h1: 28,
-  h2: 24,
-  h3: 20,
-  h4: 18,
-
-  // Body
-  bodyLarge: 17,
-  body: 15,
-  bodySmall: 13,
-
-  // Caption/Labels
-  caption: 12,
-  overline: 11,
-
-  // Special
-  statNumber: 36, // For big stats display
-};
-
-export const lineHeight = {
-  tight: 1.1, // Headlines
-  normal: 1.4, // Body text
-  relaxed: 1.6, // Long-form text
-};
-
-export const letterSpacing = {
-  tight: -0.5,
-  normal: 0,
-  wide: 0.5,
-  extraWide: 1.5, // Overlines, labels
-};
-```
-
-#### Spacing System
-
-```typescript
-// src/constants/spacing.ts
-// 4px base unit with intentional jumps
-
-export const spacing = {
-  // Micro spacing
-  xs: 4,
-  sm: 8,
-  md: 12,
-
-  // Standard spacing
-  lg: 16,
-  xl: 20,
-  "2xl": 24,
-
-  // Large spacing
-  "3xl": 32,
-  "4xl": 40,
-  "5xl": 48,
-
-  // Extra large
-  "6xl": 64,
-  "7xl": 80,
-  "8xl": 96,
-};
-
-// Semantic spacing
-export const layout = {
-  screenPaddingX: 20,
-  screenPaddingY: 16,
-  cardPadding: 16,
-  cardPaddingLarge: 20,
-  sectionGap: 32,
-  listItemGap: 12,
-  inlineGap: 8,
-  inputHeight: 52,
-  buttonHeight: 52,
-  buttonHeightSmall: 40,
-  tabBarHeight: 84,
-  headerHeight: 56,
-};
-```
-
-#### Border Radius System
-
-```typescript
-// src/constants/radius.ts
-export const radius = {
-  none: 0,
-  sm: 6,
-  md: 10,
-  lg: 14,
-  xl: 18,
-  "2xl": 24,
-  "3xl": 32,
-  full: 9999,
-};
-
-// Semantic radius
-export const componentRadius = {
-  button: 14,
-  buttonSmall: 10,
-  input: 14,
-  card: 18,
-  cardLarge: 24,
-  modal: 28,
-  bottomSheet: 28,
-  avatar: 9999,
-  badge: 8,
-  chip: 10,
-  tooltip: 10,
-};
-```
-
-#### Shadow/Elevation System
-
-```typescript
-// src/constants/shadows.ts
-import { Platform } from "react-native";
-
-export const shadows = {
-  none: {
-    shadowColor: "transparent",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0,
-    shadowRadius: 0,
-    elevation: 0,
-  },
-
-  sm: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
-  },
-
-  md: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-
-  lg: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-
-  xl: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 9,
-  },
-
-  // Colored shadows for primary elements
-  primaryGlow: {
-    shadowColor: "#0D9488",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-
-  accentGlow: {
-    shadowColor: "#F97316",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-};
-```
-
-### Component Styles
-
-#### Button Variants
-
-```typescript
-// When implementing with frontend-design skill:
-
-// Primary Button
-- Background: primary.500 → primary.600 (pressed)
-- Text: white, fontSize.body, font.bold
-- Height: 52px, borderRadius: 14px
-- Shadow: primaryGlow on idle, none on pressed
-- Animation: scale(0.97) on press, 150ms spring
-
-// Secondary Button
-- Background: neutral.100 → neutral.200 (pressed)
-- Border: 1.5px neutral.300
-- Text: neutral.800
-- No shadow
-
-// Ghost Button
-- Background: transparent → primary.50 (pressed)
-- Text: primary.500
-
-// Accent/CTA Button
-- Background: accent.500 → accent.600 (pressed)
-- Shadow: accentGlow
-- Use sparingly for main CTAs only
-```
-
-#### Card Styles
-
-```typescript
-// Match Card (distinctive diagonal accent)
-- Background: white
-- BorderRadius: 18px
-- Shadow: md
-- Padding: 16px
-- Left border: 4px accent color (based on sport)
-- Slight rotation on press: rotate(-1deg) scale(0.98)
-
-// Chat Preview Card
-- Background: white
-- BorderRadius: 14px
-- Unread indicator: accent.500 dot (8px)
-```
-
-#### Input Styles
-
-```typescript
-// Text Input
-- Background: neutral.50 → white (focused)
-- Border: 1.5px neutral.200 → primary.500 (focused)
-- BorderRadius: 14px
-- Height: 52px
-- Padding: 16px horizontal
-- Label: floating, animated on focus
-- Error: border error.main, helper text error.main
-
-// Phone Input (special)
-- Country code selector with flag
-- Divider line between code and number
-- Format as user types: +20 XXX XXX XXXX
-```
-
-#### Avatar Styles
-
-```typescript
-// Sizes
-- xs: 28px (chat messages)
-- sm: 36px (list items)
-- md: 48px (cards)
-- lg: 64px (profile headers)
-- xl: 96px (own profile)
-
-// Status dot
-- Position: bottom-right, 25% of avatar size
-- Border: 2px white
-- Colors: success (online), warning (away), neutral.400 (offline)
-
-// Stacked avatars (participants)
-- Overlap: 30%
-- Max shown: 4, then "+X" badge
-- Border: 2px white each
-```
-
-#### Badge Styles
-
-```typescript
-// Skill Level Badge
-- Beginner: bg success.light, text success.dark, icon: seedling
-- Intermediate: bg primary.100, text primary.700, icon: flame
-- Advanced: bg purple.100, text purple.700, icon: lightning
-- Pro: bg error.light, text error.dark, icon: trophy
-
-// Sport Badge
-- Pill shape, borderRadius: 8px
-- Sport icon + name
-- Background: sport color at 10% opacity
-- Text: sport color
-
-// Status Badge (match status)
-- Upcoming: accent.500 bg
-- In Progress: success.main bg, pulse animation
-- Completed: neutral.400 bg
-- Cancelled: strikethrough effect
-```
-
-### Animations & Micro-interactions
-
-```typescript
-// Use react-native-reanimated for all animations
-// src/constants/animations.ts
-
-export const animations = {
-  // Timing
-  instant: 100,
-  fast: 150,
-  normal: 250,
-  slow: 400,
-
-  // Spring configs
-  springBouncy: {
-    damping: 12,
-    stiffness: 180,
-  },
-  springSmooth: {
-    damping: 20,
-    stiffness: 200,
-  },
-  springGentle: {
-    damping: 25,
-    stiffness: 120,
-  },
-};
-
-// Key Animations to Implement:
-
-// 1. Screen Transitions
-- Shared element: Match card → Match details (image + title)
-- Push: Slide from right with parallax (background moves slower)
-- Modal: Spring up from bottom with backdrop fade
-
-// 2. List Animations
-- Initial load: Staggered fade-in + slide-up (50ms delay each)
-- Pull-to-refresh: Custom Lottie animation (ball bouncing)
-- New item: Slide in from top with highlight flash
-
-// 3. Button Feedback
-- Press: scale(0.97), 150ms spring
-- Release: scale(1), bouncy spring
-- Haptic: Light impact on press
-
-// 4. Card Interactions
-- Press: scale(0.98) + rotate(-0.5deg) + shadow reduction
-- Long press: scale(0.95) + stronger rotation
-
-// 5. Input Focus
-- Label float: translateY(-24) + scale(0.85), 200ms
-- Border color: fade to primary, 150ms
-
-// 6. Toast/Notifications
-- Enter: slide from top + fade, spring
-- Exit: slide up + fade, 200ms
-
-// 7. Tab Bar
-- Active icon: scale(1.1) + color change, bouncy spring
-- Indicator: sliding underline, smooth spring
-
-// 8. Chat
-- New message: slide up + fade, 200ms
-- Send: message slides right then up to position
-- Typing indicator: 3 dots with wave animation
-
-// 9. Map Markers
-- Appear: scale from 0 + bounce
-- Selected: scale(1.2) + shadow increase
-- Pulse: own location has infinite pulse ring
-```
-
-### Dark Mode Implementation
-
-```typescript
-// Use React Native's useColorScheme + context
-// src/contexts/ThemeContext.tsx
-
-// Key considerations:
-1. Automatic system detection with manual override option
-2. Persist user preference in AsyncStorage
-3. Smooth transition between modes (optional, 300ms fade)
-
-// Dark mode adjustments:
-- Backgrounds: Use neutral.900 → neutral.700 hierarchy (not pure black)
-- Cards: neutral.800 with subtle border (neutral.700)
-- Primary color: Bump to primary.400 for better contrast
-- Shadows: Reduce opacity, or use subtle borders instead
-- Images/avatars: Add subtle dark overlay or vignette
-
-// Components that need special dark mode treatment:
-- Map: Use dark map style (Google Maps dark theme)
-- Charts/stats: Invert axis colors
-- Inputs: Lighter placeholder text
-- Bottom sheets: Elevated background color
-```
-
-### Accessibility
-
-```typescript
-// src/constants/accessibility.ts
-
-export const a11y = {
-  // Minimum touch targets
-  minTouchSize: 44,
-
-  // Focus indicators
-  focusRingWidth: 2,
-  focusRingColor: 'primary.500',
-  focusRingOffset: 2,
-
-  // Color contrast (WCAG AA)
-  minContrastRatio: 4.5,
-  minContrastLarge: 3.0,
-
-  // Motion
-  reduceMotionAlternative: true, // Provide alternatives for animations
-
-  // Screen reader
-  announcePageChanges: true,
-  announceListUpdates: true,
-};
-
-// Required for every interactive element:
-- accessibilityLabel: descriptive text
-- accessibilityRole: 'button', 'link', 'header', etc.
-- accessibilityHint: what happens when activated
-- accessibilityState: { selected, disabled, checked }
-```
-
-### Implementation Notes
-
-> **CRITICAL**: When implementing any UI component or screen:
->
-> 1. Always invoke the `frontend-design` skill first
-> 2. Reference this design system for consistency
-> 3. Avoid generic patterns - make each component distinctive
-> 4. Test on both iOS and Android
-> 5. Verify dark mode appearance
-> 6. Check accessibility with screen readers
+**Note:** The logo is not ready yet. Use a placeholder wherever the logo is needed in the design.
 
 ---
 
@@ -1135,83 +533,115 @@ Seeded with: Basketball, Soccer, Tennis, Volleyball, Running, Padel, Swimming, G
 - Create `supabase/migrations/20260101000000_email_auth.sql` (Email OTP auth migration)
 - Generate TypeScript types after running migrations locally (`npm run db:types`)
 
-### Phase 2: Authentication
+### Phase 2: Authentication ✅ COMPLETED
 
-#### Auth Method
-- **Email OTP (Magic Link)** - User enters email, receives a sign-in link, clicks to authenticate
+#### What Was Done
 
-#### Implementation Steps
+1. **Created validation schemas** (`src/lib/validations/auth.ts`)
+   - `emailSchema` - Zod schema for email validation
+   - `otpSchema` - Zod schema for 6-digit OTP validation
 
-1. Update Supabase config for email OTP
-2. Create auth service with email OTP methods
-3. Build auth screens (Email input, OTP verification)
-4. Onboarding flow (name, avatar, sport preferences)
-5. Protected routes based on auth state
+2. **Created auth service** (`src/services/auth.ts`)
+   - `signInWithEmail(email)` - Sends OTP via Supabase
+   - `verifyOtp(email, token)` - Verifies 6-digit code
+   - `checkProfileComplete(userId)` - Checks if user has sports selected (for onboarding)
+   - `signOut()` - Signs out user
+   - Added error handling with console logging for debugging
 
-#### Auth Flow
+3. **Updated AuthProvider** (`src/providers/AuthProvider.tsx`)
+   - Added `signInWithEmail` and `verifyOtp` methods to context
+   - Added `needsOnboarding` state (checks `user_sports` table)
+   - Added `refreshOnboardingStatus()` for post-onboarding
+   - Added deep link handling via `expo-linking`
+
+4. **Built auth screens with frontend-design skill**
+   - `app/(auth)/index.tsx` - Email input with logo placeholder, animated entry
+   - `app/(auth)/verify.tsx` - 6-digit OTP input, resend with 60s cooldown
+   - `app/(auth)/onboarding.tsx` - Display name + sports selection with skill levels
+
+5. **Updated navigation logic** (`app/_layout.tsx`)
+   - Extracted `RootLayoutNav` component with auth-based routing
+   - Routes: Not authenticated → auth, needs onboarding → onboarding, complete → tabs
+
+6. **Applied database migration** (`20260101000000_email_auth.sql`)
+   - Added email column to profiles
+   - Updated trigger for email-based user creation
+
+#### Files Created
 
 ```
-Welcome → Enter Email → supabase.auth.signInWithOtp() → Check Email → Click Magic Link → Session → Onboarding (if new user)
+src/lib/validations/auth.ts
+src/services/auth.ts
+app/(auth)/index.tsx (replaced)
+app/(auth)/verify.tsx
+app/(auth)/onboarding.tsx
 ```
 
-#### Files to Create/Modify
+#### Files Modified
 
-**New Files:**
-- `app/(auth)/index.tsx` - Email input screen
-- `app/(auth)/verify.tsx` - Check your email / OTP verification screen
-- `app/(auth)/onboarding.tsx` - Profile setup (name, avatar, sports)
-- `src/services/auth.ts` - Auth service with email OTP methods
-- `src/lib/validations/auth.ts` - Zod schemas for email validation
-- `supabase/migrations/20260101000000_email_auth.sql` - Remove phone_number, update trigger
-
-**Files to Modify:**
-- `app/(auth)/_layout.tsx` - Register auth screens
-- `src/services/supabase.ts` - Enable `detectSessionInUrl: true`
-- `src/providers/AuthProvider.tsx` - Add auth methods, handle deep links
-- `supabase/config.toml` - Enable email OTP
-
-#### Supabase Config Changes
-
-```toml
-# Disable SMS auth
-[auth.sms]
-enable_signup = false
-enable_confirmations = false
-
-# Enable email OTP (magic link)
-[auth.email]
-enable_signup = true
-enable_confirmations = false  # No confirmation needed for OTP
+```
+src/providers/AuthProvider.tsx
+app/_layout.tsx
+supabase/config.toml
 ```
 
-#### Database Migration (20260101000000_email_auth.sql)
+### Phase 2.5: Code Cleanup & Component Centralization ✅ COMPLETED
 
-```sql
--- Remove phone_number, add email to profiles
-ALTER TABLE profiles DROP COLUMN IF EXISTS phone_number;
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email TEXT;
-CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email) WHERE email IS NOT NULL;
+#### What Was Done
 
--- Update trigger for email users
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, display_name)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    split_part(NEW.email, '@', 1)  -- Default display name from email
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+Refactored the 3 auth screens to use centralized theme constants, reusable UI components, and custom animation hooks. Reduced code duplication by ~42%.
+
+1. **Created theme constants** (`src/constants/theme.ts`)
+   - `colors` - Primary, background, text, error, skill level colors
+   - `fonts` - Manrope (headings), Plus Jakarta Sans (body)
+   - `fontSizes` - xs through 3xl
+   - `spacing` - xs through 4xl
+   - `borderRadius` - xs through full
+   - `shadows` - Button shadow configs
+   - `animation` - Duration and scale values
+
+2. **Created animation hooks** (`src/hooks/useAnimations.ts`)
+   - `useEntryAnimation()` - Fade + slide for screen entry
+   - `useButtonPress()` - Scale animation for pressable buttons
+   - `useBorderAnimation()` - Animated border color for inputs
+
+3. **Created reusable UI components** (`src/components/ui/`)
+   - `ScreenContainer` - KeyboardAvoidingView + ScrollView wrapper with safe area
+   - `AnimatedInput` - Input with animated border, label, error display
+   - `PrimaryButton` - Animated button with loading/disabled states
+   - `index.ts` - Barrel export
+
+4. **Refactored auth screens**
+   - All screens now use shared components and theme constants
+   - Removed duplicated animation logic, styles, and handlers
+
+#### Code Reduction
+
+| File | Before | After | Reduction |
+|------|--------|-------|-----------|
+| index.tsx | 368 lines | 159 lines | 57% |
+| verify.tsx | 472 lines | 257 lines | 46% |
+| onboarding.tsx | 631 lines | 443 lines | 30% |
+| **New shared code** | 0 | ~300 lines | - |
+| **Net reduction** | 1471 lines | ~859 lines | **42%** |
+
+#### Files Created
+
+```
+src/constants/theme.ts
+src/hooks/useAnimations.ts
+src/components/ui/ScreenContainer.tsx
+src/components/ui/AnimatedInput.tsx
+src/components/ui/PrimaryButton.tsx
+src/components/ui/index.ts
 ```
 
-#### Notes
+#### Benefits
 
-- **Works in Expo Go** - No native modules required for email OTP
-- **Deep links** - Required for magic link callbacks
-- **Use frontend-design skill** - For all auth screens per project design requirements
+- Consistent styling across all screens
+- Single source of truth for design tokens
+- Reusable components for future screens
+- Easier maintenance and updates
 
 ### Phase 3: Location & Discovery
 
